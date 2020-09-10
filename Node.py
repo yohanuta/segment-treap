@@ -21,12 +21,6 @@ from Interval import Interval, n_inf, p_inf
 def generate_priority():
     return random.random()
 
-# def display_priority(priority):
-#     if priority == n_inf:
-#         return "-inf"
-#     else:
-#         return str(round(self.priority * 10) % 10)
-
 class Node():
     """A class for nodes of segment treaps without parent pointers,
     i.e. for insertions using zipping.
@@ -98,6 +92,7 @@ class Node():
         return str(self.key) + "," + str(self.associated_interval) + "," + str(self.can)
 
     def is_leaf(self):
+        """Return True iff self is a leaf."""
         return self.left == None and self.right == None
 
     def display_priority(self):
@@ -107,6 +102,8 @@ class Node():
             return str(round(self.priority * 10) % 10)
 
     def traverse(self):
+        """Return the set of all segments that belong to a leaf in self's subtree.
+        """
         if self.is_leaf():
             if self.belonging_segment is None:
                 ## We are at the dummy node
@@ -117,6 +114,9 @@ class Node():
             return self.left.traverse().union(self.right.traverse())
 
     def update_can(self, parent):
+        """Looks through all segments in self.can. Deletes all that do not
+        fulfill the definition of the canonical subset.
+        """
         segments = list(self.can)
         #print("Update", self, "with parent", parent, ". Segments in Question:", segments)
         self.can = set()
@@ -129,6 +129,9 @@ class Node():
         # print("Appropriate segments:", self.can)
 
     def find_can(self, parent, segments):
+        """Make self.can the subset of segments that fulfills the definition of
+        the canonical subset.
+        """
         # print("Update", self, "with parent", parent, ". Segments in Question:", segments)
         self.can = set()
         int_self = self.associated_interval
@@ -139,6 +142,10 @@ class Node():
         # print("Appropriate segments:", self.can)
 
     def pull_segments_from_child(self, child, parent):
+        """Delete the appropriate segments of the canonical subset of 
+        non-search-path child child and of the just deleted segments, add those
+        to self.can, that fulfill the definition of the canonical subset.
+        """ 
         #print("pull: before:", self, child, parent)
         if child == None:
             return
@@ -151,21 +158,8 @@ class Node():
 
         #print("pull: after:", self, child, parent)
 
-    # def update_corner_node(self, parent):
-    #     int_self = self.associated_interval
-    #     int_par = parent.associated_interval
-    #     can = list(self.can)
-    #     ##step 1:
-    #     for segment in can:    
-    #         if segment.covers(int_par):
-    #             self.can.remove(segment)
-    #     ##step 2 works together with non-corner cases seperately
-
-    #     ##step 3
-    #     empty collection 
-
     def _display_aux(self):
-        """Returns list of strings, width, height, and horizontal coordinate of the root. 
+        """Return list of strings, width, height, and horizontal coordinate of the root. 
         This was copied from 
         https://stackoverflow.com/questions/34012886/print-binary-tree-level-by-level-in-python."""
         # No child.
@@ -209,9 +203,13 @@ class Node():
         return lines, n + m + u, max(p, q) + 2, n + u // 2
 
     def is_covered_by(self, segment):
+        """Return True iff segment covers self.
+        """
         return segment.covers(self.associated_interval)
 
     def add_segment_to_cans(self, segment, debug_treap=None):
+        """Add segment to appropriate canonical subsets in subtree with root self.
+        """
         # print("check: ",self, segment)
         if self.is_covered_by(segment):
             # print("add")
@@ -225,6 +223,7 @@ class Node():
                 self.right.add_segment_to_cans(segment, debug_treap)
 
     def union_of_children_intervals(self):
+        """Return the union of self's children's intervals."""
         if self.left is None and self.right is None:
             return Interval()
         elif self.left is None:
