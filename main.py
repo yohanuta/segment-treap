@@ -16,7 +16,6 @@
 import time
 import random
 import matplotlib.pyplot as plt
-import progressbar
 
 from SegmentTreap import pSegmentTreap, SegmentTreap, cSegmentTreap
 from Interval import Interval, n_inf, p_inf
@@ -123,7 +122,7 @@ def test(num_segments=100, num_iterations=1000, method = "Rotations"):
     return end - start
 
 
-def plot_results(max_num_segments = 1000, step = 50, segments_per_iteration = 100000, Rotations = True, classic_zipping = True, complex_zipping = True):
+def plot_results(max_num_segments = 1000, step = 50, segments_per_iteration = 100000, Rotations = True, classic_zipping = True, complex_zipping = True, filename = 'test.png'):
     """plot the results of the test() function for different kinds of segment treaps
     
     Parameters:
@@ -168,24 +167,30 @@ def plot_results(max_num_segments = 1000, step = 50, segments_per_iteration = 10
             data_classiczipping.append(test(num_segments, num_iterations, method = "Zipping")/num_iterations)
         if complex_zipping == True:
             data_complexzipping.append(test(num_segments, num_iterations, method = "ComplexZipping")/num_iterations)
+        ###
 
-    if Rotations == True:
-        plt.plot(x_axis, data_rotations, 'b', label="Rotations")
     if classic_zipping == True:
-        plt.plot(x_axis, data_classiczipping, 'r', label="classic Zipping")
+        plt.plot(x_axis, data_classiczipping, 'r', label="Zipping")
     if complex_zipping == True:
         plt.plot(x_axis, data_complexzipping, 'g', label="complex Zipping")
+    if Rotations == True:
+        plt.plot(x_axis, data_rotations, 'b', label="Rotations")
     plt.xlabel('number of inserted segments')
     plt.ylabel('average time of generating Segment Treap')
     plt.legend()
-    # plt.xscale("log")
-    plt.show()
+    # plt.show()
+    plt.savefig(filename)
+    plt.close()
+
+
+
     end = time.time()
     seconds = int(end - start)
     minutes = seconds // 60
     seconds = seconds % 60
     print("Making this graph took", minutes, "minutes and ", seconds, "seconds.")
 
-plot_results(1000, 50, 10000)
+plot_results(1000, 10, 100000, complex_zipping=True, filename="three.png")
+plot_results(1000, 10, 100000, complex_zipping=False, filename="two.png")
 # random_test_double(100,100)
 
